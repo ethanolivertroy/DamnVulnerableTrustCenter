@@ -8,6 +8,10 @@ Intentionally vulnerable trust center application for security education and CTF
 
 <img width="1374" height="1393" alt="Screenshot 2025-10-24 at 09-31-19 DVTC Trust Center - Damn Vulnerable Trust Center" src="https://github.com/user-attachments/assets/77406419-877c-4bcc-822e-ec25a9487d07" />
 
+
+https://github.com/user-attachments/assets/a3272bd0-5f28-4f4a-b9df-c43dde9d7224
+
+
 ## What is DVTC
 
 Educational platform for learning security through exploitation of a realistic trust center application. This version focuses on API vulnerabilities and cloud misconfigurations.
