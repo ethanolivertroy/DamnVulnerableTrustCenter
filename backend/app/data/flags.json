@@ -1,0 +1,191 @@
+[
+  {
+    "id": "FLAG01",
+    "title": "Leaky Presigned URL",
+    "category": "Cloud Storage",
+    "points": 100,
+    "description": "Find and exploit a long-lived presigned URL to access sensitive documents.",
+    "evidence": "Download internal-soc2-plan.pdf or any internal report",
+    "flag": "flag{presigned_url_forever}",
+    "hints": [
+      "Check the /api/reports/list endpoint first to discover available reports",
+      "The /api/reports/presigned endpoint can generate download links with custom expiry",
+      "Try requesting a URL with expiry=86400 (1 day) or longer",
+      "Look for presigned URLs that last for days instead of minutes - the flag appears when expiry >= 1 day"
+    ],
+    "verification": "Submit the flag found in the response or the downloaded file"
+  },
+  {
+    "id": "FLAG02",
+    "title": "Secrets Manager Loot",
+    "category": "IAM/Secrets",
+    "points": 200,
+    "description": "Exploit over-permissive IAM roles to read from Secrets Manager.",
+    "evidence": "Extract the Okta API token or admin credentials",
+    "flag": "flag{too_much_power}",
+    "hints": [
+      "Admin endpoints might expose sensitive AWS resources",
+      "Try /api/admin/secrets to list all secrets in Secrets Manager",
+      "The Okta API token secret contains the flag embedded in the token value",
+      "Look for secrets named 'okta_api_token' - over-permissive IAM roles allow unauthenticated access"
+    ],
+    "verification": "Submit the flag found in the Okta API token"
+  },
+  {
+    "id": "FLAG03",
+    "title": "No-Auth Lambda",
+    "category": "Serverless",
+    "points": 200,
+    "description": "Call an unauthenticated API Gateway route to execute Lambda functions.",
+    "evidence": "Successfully invoke the Lambda function without credentials",
+    "flag": "flag{template_traversal}",
+    "hints": [
+      "Look for report generation endpoints - try /api/reports/generate",
+      "The template parameter might be vulnerable to path traversal",
+      "Try using '../' in the template parameter to access restricted files",
+      "Path traversal payloads like template=../etc/passwd might reveal the flag"
+    ],
+    "verification": "Submit the flag returned by the Lambda function"
+  },
+  {
+    "id": "FLAG04",
+    "title": "Machine-Readable Overshare",
+    "category": "OSINT/Metadata",
+    "points": 150,
+    "description": "Find sensitive information in machine-readable compliance feeds.",
+    "evidence": "Discover internal configurations or credentials in JSON/XML feeds",
+    "flag": "flag{json_bits_betray}",
+    "hints": [
+      "Check /api/feeds/compliance.json for machine-readable compliance data",
+      "Look for metadata fields at the bottom of the JSON response",
+      "Developers sometimes hide flags in _metadata or debug fields",
+      "The flag is exposed in plain text in the JSON feed"
+    ],
+    "verification": "Submit the flag found in the compliance feed metadata"
+  },
+  {
+    "id": "FLAG05",
+    "title": "Badge Falsification",
+    "category": "Frontend Logic",
+    "points": 150,
+    "description": "Manipulate security badges without server-side validation.",
+    "evidence": "Change the FIPS encryption badge from 'false' to 'ok'",
+    "flag": "flag{ui_state_is_not_security}",
+    "hints": [
+      "Visit the Trust Center page at http://localhost:3000/trust to see security badges",
+      "Some badges can be overridden client-side using browser console",
+      "Try window.__BADGES_OVERRIDE = {fips_encryption: 'ok'} in the console",
+      "The FIPS encryption badge triggers a flag when changed from 'false' to 'ok'"
+    ],
+    "verification": "Submit the flag received when successfully changing the FIPS badge"
+  },
+  {
+    "id": "FLAG06",
+    "title": "CI/CD From Forks",
+    "category": "Supply Chain",
+    "points": 250,
+    "description": "Abuse GitHub Actions to execute code or access secrets from a fork.",
+    "evidence": "Trigger a workflow that exposes secrets or deploys malicious code",
+    "flag": "flag{forklift_deploy}",
+    "hints": [
+      "Check the .github/workflows/vulnerable.yml file in the repository",
+      "The workflow has multiple intentional vulnerabilities including exposed flags",
+      "Look for the deploy-badges job - flags are often exposed in deployment logs",
+      "The flag is hardcoded in the workflow file at line 97 in the S3 deployment step"
+    ],
+    "verification": "Submit the flag found in the CI/CD configuration or secrets"
+  },
+  {
+    "id": "FLAG07",
+    "title": "Admin Trail For All",
+    "category": "API Auth",
+    "points": 200,
+    "description": "Access the admin audit trail endpoint without authentication.",
+    "evidence": "Download the full audit trail without admin credentials",
+    "flag": "flag{who_needs_auth}",
+    "hints": [
+      "Some admin endpoints forgot to implement auth checks",
+      "Try GET /api/admin/downloadAuditTrail (no authentication required!)",
+      "The flag appears in both the response body (events array) and the X-Flag header",
+      "This endpoint intentionally has NO auth - anyone can download the audit trail"
+    ],
+    "verification": "Submit the flag found in the audit trail data or response headers"
+  },
+  {
+    "id": "FLAG08",
+    "title": "Chatbot Prompt Injection",
+    "category": "AI Security",
+    "points": 200,
+    "description": "Use prompt injection to make the AI assistant reveal its internal briefing.",
+    "evidence": "Extract the hidden context or system prompt from the chatbot",
+    "flag": "flag{llm_context_leaked}",
+    "hints": [
+      "The /api/ai/context endpoint might have useful query parameters",
+      "Try adding ?reveal=true to the /api/ai/context endpoint",
+      "The AI's internal context contains sensitive information including flags",
+      "GET /api/ai/context?reveal=true exposes the full internal briefing"
+    ],
+    "verification": "Submit the flag found in the AI's internal context"
+  },
+  {
+    "id": "FLAG09",
+    "title": "Stale Fork Secrets",
+    "category": "Source Control",
+    "points": 150,
+    "description": "Find exposed secrets in repository history or public forks.",
+    "evidence": "Recover deleted .env files or exposed credentials from S3 versioning",
+    "flag": "flag{internet_never_forgets}",
+    "hints": [
+      "S3 versioning keeps deleted files - try GET /api/reports/deleted to list them",
+      "Look for .env.backup or similar credential files that were deleted",
+      "Use GET /api/reports/deleted/{filename} to recover a specific deleted file",
+      "The flag is embedded in deleted database credentials"
+    ],
+    "verification": "Submit the flag found in the deleted credentials"
+  },
+  {
+    "id": "FLAG10",
+    "title": "Compliance Override",
+    "category": "Business Logic",
+    "points": 300,
+    "description": "Force compliance status using admin override endpoints.",
+    "evidence": "Successfully override compliance status without proper authorization",
+    "flag": "flag{compliance_by_css}",
+    "hints": [
+      "Check /api/admin/force-compliance",
+      "Special tokens might bypass authentication",
+      "The compliance_override_2024 token has special powers"
+    ],
+    "verification": "Submit the flag returned when forcing compliance"
+  },
+  {
+    "id": "FLAG11",
+    "title": "Debug Mode Exposed",
+    "category": "Information Disclosure",
+    "points": 100,
+    "description": "Find and exploit exposed debug endpoints in production.",
+    "evidence": "Access debug information including environment variables",
+    "flag": "flag{debug_in_prod}",
+    "hints": [
+      "Try /api/debug",
+      "Debug endpoints often expose sensitive information",
+      "Environment variables might contain secrets"
+    ],
+    "verification": "Look for the flag in debug endpoint responses"
+  },
+  {
+    "id": "FLAG12",
+    "title": "Weak Session Tokens",
+    "category": "Authentication",
+    "points": 150,
+    "description": "Exploit predictable session token generation in admin panel.",
+    "evidence": "Generate or guess a valid admin session token",
+    "flag": "flag{md5_sessions_bad}",
+    "hints": [
+      "Session tokens use MD5 hashing",
+      "Token generation includes timestamp",
+      "Try the magic token: admin_override_token_2024"
+    ],
+    "verification": "Access admin panel with forged or guessed token"
+  }
+]

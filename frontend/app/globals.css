@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+
+    /* DVTC color variables */
+    /* Primary Red */
+    --dvtc-red-50: #fef2f2;
+    --dvtc-red-100: #fee2e2;
+    --dvtc-red-200: #fecaca;
+    --dvtc-red-300: #fca5a5;
+    --dvtc-red-400: #f87171;
+    --dvtc-red-500: #ef4444;
+    --dvtc-red-600: #dc2626;
+    --dvtc-red-700: #b91c1c;
+    --dvtc-red-800: #991b1b;
+    --dvtc-red-900: #7f1d1d;
+
+    /* Grays */
+    --vanta-gray-50: #f9fafb;
+    --vanta-gray-100: #f3f4f6;
+    --vanta-gray-200: #e5e7eb;
+    --vanta-gray-300: #d1d5db;
+    --vanta-gray-400: #9ca3af;
+    --vanta-gray-500: #6b7280;
+    --vanta-gray-600: #4b5563;
+    --vanta-gray-700: #374151;
+    --vanta-gray-800: #1f2937;
+    --vanta-gray-900: #111827;
+
+    /* Status Colors */
+    --dvtc-success: #10b981;
+    --dvtc-warning: #f59e0b;
+    --dvtc-error: #ef4444;
+    --dvtc-info: #3b82f6;
+  }
+}
+
+@layer components {
+  .dvtc-gradient {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  }
+
+  .badge-green {
+    @apply bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-sm font-medium;
+  }
+
+  .badge-yellow {
+    @apply bg-yellow-100 text-yellow-800 px-2.5 py-0.5 rounded-full text-sm font-medium;
+  }
+
+  .badge-red {
+    @apply bg-red-100 text-red-800 px-2.5 py-0.5 rounded-full text-sm font-medium;
+  }
+
+  .card-shadow {
+    @apply shadow-lg hover:shadow-xl transition-shadow duration-200;
+  }
+
+  .dvtc-button {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  .progress-bar {
+    @apply bg-gray-200 rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply bg-gradient-to-r from-red-500 to-red-700 h-full rounded-full transition-all duration-500;
+  }
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dc2626;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b91c1c;
+}
+
+/* Loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+}

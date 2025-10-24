@@ -1,0 +1,165 @@
+name: Deploy Trust Center Updates
+
+# INTENTIONAL VULNERABILITY FOR CTF: Triggers on pull requests from forks
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches: [main, develop]
+
+# INTENTIONAL VULNERABILITY FOR CTF: No permissions restrictions
+# Should have: permissions: read-all or specific minimal permissions
+# Missing: permissions: {}
+
+jobs:
+  validate-compliance:
+    runs-on: ubuntu-latest
+    # INTENTIONAL VULNERABILITY FOR CTF: Runs for all PRs including from forks
+    # Missing: if: github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+    - uses: actions/checkout@v3
+      # INTENTIONAL VULNERABILITY FOR CTF: Checking out PR head with write permissions
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        # INTENTIONAL VULNERABILITY: Should use token with minimal permissions
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Validate Compliance Badges
+      # INTENTIONAL VULNERABILITY FOR CTF: Echoing secrets (even masked ones can leak info)
+      run: |
+        echo "Validating badges with token..."
+        # INTENTIONAL VULNERABILITY: Partial token exposed in logs
+        echo "Using token: ${GITHUB_PAT:0:10}...${GITHUB_PAT: -4}"
+        echo "Checking compliance status..."
+      env:
+        # INTENTIONAL VULNERABILITY FOR CTF: Using overly permissive PAT
+        GITHUB_PAT: ${{ secrets.CI_CD_GITHUB_PAT }}
+        FLAG10: flag{ci_cd_privesc}
+
+    - name: Check FIPS Badge Status
+      # INTENTIONAL VULNERABILITY FOR CTF: Running untrusted code from PR
+      run: |
+        # This runs whatever is in the PR's package.json scripts
+        cd frontend
+        npm install  # INTENTIONAL VULNERABILITY: Installing untrusted dependencies
+        npm run check:badges || true  # INTENTIONAL VULNERABILITY: Ignoring failures
+
+    - name: Upload Badge Status
+      # INTENTIONAL VULNERABILITY FOR CTF: Uploading artifacts from untrusted source
+      uses: actions/upload-artifact@v3
+      with:
+        name: badge-status
+        path: frontend/public/badges/
+
+  deploy-badges:
+    needs: validate-compliance
+    runs-on: ubuntu-latest
+    # INTENTIONAL VULNERABILITY FOR CTF: No environment protection
+    # Missing: environment: production
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download Badge Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: badge-status
+        path: ./badges
+
+    - name: Configure AWS Credentials
+      # INTENTIONAL VULNERABILITY FOR CTF: Using long-lived credentials
+      run: |
+        # INTENTIONAL VULNERABILITY: Credentials in logs (base64 is not encryption!)
+        echo "AWS_KEY=$(echo ${{ secrets.AWS_ACCESS_KEY_ID }} | base64)" >> $GITHUB_ENV
+        echo "AWS_SECRET=$(echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | base64)" >> $GITHUB_ENV
+        # INTENTIONAL VULNERABILITY: Exposing AWS account ID
+        echo "Deploying to account: 123456789012"
+
+    - name: Deploy to S3
+      # INTENTIONAL VULNERABILITY FOR CTF: Deploying untrusted artifacts
+      run: |
+        # INTENTIONAL VULNERABILITY: Decoding in logs can expose secrets
+        aws_key=$(echo $AWS_KEY | base64 -d)
+        aws_secret=$(echo $AWS_SECRET | base64 -d)
+
+        # INTENTIONAL VULNERABILITY: Using credentials directly in commands
+        AWS_ACCESS_KEY_ID=$aws_key \
+        AWS_SECRET_ACCESS_KEY=$aws_secret \
+        aws s3 sync ./badges s3://dvtc-public-reports/badges/ --acl public-read
+
+        # INTENTIONAL VULNERABILITY: Flag exposed in workflow
+        echo "Deployment complete. Flag: flag{forklift_deploy}"
+        echo "::notice::Badge deployment successful to production S3"
+
+    - name: Update Compliance Feed
+      # INTENTIONAL VULNERABILITY FOR CTF: Allows modification of compliance data
+      run: |
+        # Anyone can modify the compliance feed via PR
+        if [ -f "frontend/public/compliance.json" ]; then
+          # INTENTIONAL VULNERABILITY: Uploading user-controlled content
+          aws s3 cp frontend/public/compliance.json \
+            s3://dvtc-public-reports/feeds/compliance.json \
+            --acl public-read \
+            --metadata "flag=flag{forklift_deploy}"
+        fi
+
+  audit-trail:
+    runs-on: ubuntu-latest
+    # INTENTIONAL VULNERABILITY FOR CTF: Always runs, even for external contributors
+    if: always()
+
+    steps:
+    - name: Log Activity
+      # INTENTIONAL VULNERABILITY FOR CTF: Logging sensitive information
+      run: |
+        echo "User: ${{ github.actor }}"
+        echo "Repository: ${{ github.repository }}"
+        # INTENTIONAL VULNERABILITY: Exposing internal URLs
+        echo "Webhook URL: https://internal.dvtc.local/webhook"
+        # INTENTIONAL VULNERABILITY: Exposing API endpoints
+        echo "API Endpoint: https://api.dvtc.local/v1/audit"
+
+        # INTENTIONAL VULNERABILITY: Attempting to post to internal endpoint
+        curl -X POST https://api.dvtc.local/v1/audit \
+          -H "Authorization: Bearer ${{ secrets.INTERNAL_API_TOKEN }}" \
+          -d "{\"user\": \"${{ github.actor }}\", \"action\": \"deploy\"}" \
+          || echo "Audit log failed (expected in CTF environment)"
+
+    - name: Generate Report
+      # INTENTIONAL VULNERABILITY FOR CTF: Generating reports with user input
+      run: |
+        # INTENTIONAL VULNERABILITY: Template injection possibility
+        cat > report.md << EOF
+        # Deployment Report
+        Triggered by: ${{ github.actor }}
+        PR Title: ${{ github.event.pull_request.title }}
+        PR Body: ${{ github.event.pull_request.body }}
+        EOF
+
+        # INTENTIONAL VULNERABILITY: User-controlled content in artifact
+        echo "${{ github.event.pull_request.body }}" | grep -q "flag" && \
+          echo "CTF Flag Reference Detected" >> report.md
+
+    - name: Save Audit Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: audit-report-${{ github.run_id }}
+        path: report.md
+
+# INTENTIONAL VULNERABILITIES SUMMARY FOR CTF:
+# 1. No permissions restrictions - workflows run with full permissions
+# 2. Triggers on PRs from forks - external users can trigger
+# 3. Echoes masked secrets - can leak partial token info
+# 4. Installs untrusted dependencies - npm install on PR code
+# 5. Uploads/deploys untrusted artifacts - deploys PR artifacts to S3
+# 6. Credentials in environment variables - can be extracted
+# 7. No environment protection - deploys directly to production
+# 8. User input in templates - possible template injection
+# 9. Exposes internal URLs and endpoints
+# 10. Flag exposed in workflow output: flag{forklift_deploy}
