@@ -33,7 +33,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_REGION=us-east-1
       - LOCALSTACK_URL=http://localstack:4566
-      - FRONTEND_URL=http://localhost:3000
+      - FRONTEND_URL=http://localhost:3001
       - SECRET_KEY=super-secret-key-for-ctf
       - DEBUG=true
     depends_on:
@@ -62,7 +62,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules

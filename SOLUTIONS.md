@@ -212,7 +212,7 @@ Client-Side Security Controls - Frontend Logic Bypass
 
 Step 1: Visit the Trust Center page
 ```
-http://localhost:3000/trust
+http://localhost:3001/trust
 ```
 
 Step 2: Open browser DevTools console (F12)

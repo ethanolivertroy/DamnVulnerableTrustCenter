@@ -23,7 +23,7 @@ Educational platform for learning security through exploitation of a realistic t
 ### Prerequisites
 - Docker & Docker Compose
 - 8GB+ RAM
-- Ports 3000, 8000, 4566 available
+- Ports 3001, 8000, 4566 available
 
 ### Installation
 
@@ -34,17 +34,17 @@ make init && make up
 ```
 
 ### Access
-- Frontend: http://localhost:3000
+- Frontend: http://localhost:3001
 - Backend API: http://localhost:8000/api/docs
 - LocalStack: http://localhost:4566
-- CTF: http://localhost:3000/ctf
+- CTF: http://localhost:3001/ctf
 
 ## Architecture
 
 ```mermaid
 graph TB
     subgraph "Frontend"
-        A[Next.js 14 App<br/>Port 3000]
+        A[Next.js 14 App<br/>Port 3001]
     end
 
     subgraph "Backend"

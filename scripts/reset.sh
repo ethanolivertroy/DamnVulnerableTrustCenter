@@ -163,7 +163,7 @@ except:
     localstack_health=$(curl -s http://localhost:4566/_localstack/health 2>/dev/null | grep -q "running" && echo "✓ Healthy" || echo "✗ Down")
     echo -e "  LocalStack status: ${localstack_health}"
 
-    frontend_health=$(curl -s http://localhost:3000 2>/dev/null | grep -q "DVTC" && echo "✓ Healthy" || echo "✗ Down")
+    frontend_health=$(curl -s http://localhost:3001 2>/dev/null | grep -q "DVTC" && echo "✓ Healthy" || echo "✗ Down")
     echo -e "  Frontend status: ${frontend_health}"
 }
 
@@ -198,7 +198,7 @@ main() {
     echo -e "${GREEN}================================================${NC}"
     echo ""
     echo -e "${BLUE}Access points:${NC}"
-    echo "  Frontend:   http://localhost:3000"
+    echo "  Frontend:   http://localhost:3001"
     echo "  Backend:    http://localhost:8000"
     echo "  LocalStack: http://localhost:4566"
     echo ""

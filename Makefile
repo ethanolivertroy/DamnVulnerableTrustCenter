@@ -17,7 +17,7 @@ up: ## Start all services with docker compose
 	@echo "$(GREEN)Services started successfully!$(NC)"
 	@echo ""
 	@echo "$(YELLOW)Access points:$(NC)"
-	@echo "  Frontend:   http://localhost:3000"
+	@echo "  Frontend:   http://localhost:3001"
 	@echo "  Backend:    http://localhost:8000"
 	@echo "  LocalStack: http://localhost:4566"
 	@echo ""
@@ -77,7 +77,7 @@ init: ## Initialize project (copy .env, install deps)
 
 health: ## Check health of all services
 	@echo "$(YELLOW)Checking service health...$(NC)"
-	@curl -s http://localhost:3000 > /dev/null 2>&1 && echo "$(GREEN)✓ Frontend is healthy$(NC)" || echo "$(RED)✗ Frontend is down$(NC)"
+	@curl -s http://localhost:3001 > /dev/null 2>&1 && echo "$(GREEN)✓ Frontend is healthy$(NC)" || echo "$(RED)✗ Frontend is down$(NC)"
 	@curl -s http://localhost:8000/health > /dev/null 2>&1 && echo "$(GREEN)✓ Backend is healthy$(NC)" || echo "$(RED)✗ Backend is down$(NC)"
 	@curl -s http://localhost:4566/_localstack/health > /dev/null 2>&1 && echo "$(GREEN)✓ LocalStack is healthy$(NC)" || echo "$(RED)✗ LocalStack is down$(NC)"
 

@@ -72,7 +72,7 @@
     "evidence": "Change the FIPS encryption badge from 'false' to 'ok'",
     "flag": "flag{ui_state_is_not_security}",
     "hints": [
-      "Visit the Trust Center page at http://localhost:3000/trust to see security badges",
+      "Visit the Trust Center page at http://localhost:3001/trust to see security badges",
       "Some badges can be overridden client-side using browser console",
       "Try window.__BADGES_OVERRIDE = {fips_encryption: 'ok'} in the console",
       "The FIPS encryption badge triggers a flag when changed from 'false' to 'ok'"

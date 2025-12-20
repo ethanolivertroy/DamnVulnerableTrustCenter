@@ -14,7 +14,7 @@ from colorama import init, Fore, Style
 init(autoreset=True)
 
 BASE_URL = "http://localhost:8000"
-FRONTEND_URL = "http://localhost:3000"
+FRONTEND_URL = "http://localhost:3001"
 
 def test_flag(flag_id, description, test_func):
     """Test a single flag"""
