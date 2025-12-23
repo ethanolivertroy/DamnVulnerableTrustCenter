@@ -190,7 +190,7 @@ export default function AuditsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>

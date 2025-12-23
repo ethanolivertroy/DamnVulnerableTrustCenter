@@ -186,7 +186,7 @@ export default function AdminDashboard() {
                 <h3 className="text-sm font-medium text-gray-700 mb-2">AWS Configuration</h3>
                 <div className="bg-gray-50 rounded p-3 font-mono text-xs">
                   <p>Region: {dashboardData?.sensitive_config?.aws_region}</p>
-                  <p>LocalStack: {dashboardData?.sensitive_config?.localstack_url}</p>
+                  <p>Mock AWS: in-memory</p>
                   <p>Debug Mode: {dashboardData?.sensitive_config?.debug_mode}</p>
                 </div>
               </div>

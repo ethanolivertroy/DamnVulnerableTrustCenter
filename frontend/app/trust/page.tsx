@@ -31,7 +31,7 @@ export default function TrustCenterPage() {
       <div className="bg-white min-h-screen">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-red-700 to-red-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-4">
             <ShieldCheckIcon className="w-10 h-10" />
             <h1 className="text-4xl font-bold">DVTC Trust Center</h1>
@@ -51,7 +51,7 @@ export default function TrustCenterPage() {
       </div>
 
       {/* Certifications */}
-      <div className="max-w-7xl mx-auto px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-8">Our Certifications & Compliance</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">

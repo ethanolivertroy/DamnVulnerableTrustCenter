@@ -243,7 +243,7 @@ export default function ControlsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Security Controls</h1>
           <p className="text-gray-600 mt-2">View and manage framework-specific security controls</p>

@@ -190,7 +190,7 @@ export default function PoliciesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Policies</h1>
         <p className="text-gray-600 mt-2">Manage and review your compliance policies</p>

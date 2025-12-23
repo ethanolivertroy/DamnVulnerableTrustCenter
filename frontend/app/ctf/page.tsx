@@ -309,7 +309,7 @@ function ChallengeCard({ flag, onSubmit, isCompleted }: any) {
                 placeholder="flag{...}"
                 value={flagValue}
                 onChange={(e) => setFlagValue(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="flex-1 px-3 py-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-red-500"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     onSubmit(flag.id, flagValue);
@@ -325,13 +325,13 @@ function ChallengeCard({ flag, onSubmit, isCompleted }: any) {
                   onSubmit(flag.id, flagValue);
                   setFlagValue('');
                 }}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium min-h-[44px]"
               >
                 Submit Flag
               </button>
               <button
                 onClick={fetchMoreHints}
-                className="p-2 text-red-600 hover:text-red-700 border border-red-200 rounded-lg"
+                className="p-3 text-red-600 hover:text-red-700 border border-red-200 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title={showHint ? "Show more hints" : "Show hint"}
               >
                 <LightBulbIcon className="w-5 h-5" />

@@ -37,7 +37,7 @@ export default function RootLayout({
         <Providers>
           <Toaster position="top-right" />
           <Navigation />
-          <div className="pl-64 pt-16">
+          <div className="pt-16 md:pl-64">
             <main className="min-h-screen bg-gray-50">
               {children}
             </main>

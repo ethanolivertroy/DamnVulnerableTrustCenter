@@ -56,7 +56,7 @@ export default function TestsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Tests</h1>
         <p className="text-gray-600 mt-2">Manage and monitor your compliance and security tests</p>
@@ -191,7 +191,7 @@ export default function TestsPage() {
       {/* CTF Hint */}
       <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p className="text-xs text-yellow-800">
-          Debug: Test results stored in S3 bucket without encryption. Check LocalStack logs for details.
+          Debug: Test results stored in S3 bucket without encryption. Check backend logs for details.
         </p>
       </div>
       </div>

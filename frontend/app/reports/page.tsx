@@ -19,7 +19,7 @@ const reports = [
 export default function ReportsPage() {
   return (
     <ProtectedRoute>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
         <p className="text-gray-600 mt-2">Access and download compliance and security reports</p>
