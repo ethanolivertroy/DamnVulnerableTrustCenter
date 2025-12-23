@@ -1,6 +1,6 @@
 # Damn Vulnerable Trust Center (DVTC)
 
-**Version 0.2 - Simplified Edition**
+**Version 0.1.0 - Simplified Edition**
 
 Intentionally vulnerable trust center application for security education and CTF competitions.
 
