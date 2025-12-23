@@ -1,50 +1,15 @@
 services:
-  localstack:
-    image: localstack/localstack:latest
-    container_name: dvtc-localstack
-    environment:
-      - SERVICES=s3,lambda,iam,secretsmanager,apigateway
-      - DEBUG=1
-      - AWS_DEFAULT_REGION=us-east-1
-      - LAMBDA_EXECUTOR=docker
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - PERSISTENCE=1
-    ports:
-      - "4566:4566"
-      - "4571:4571"
-    volumes:
-      - ./localstack/init:/etc/localstack/init/ready.d
-      - ./localstack/seed:/seed
-      - /var/run/docker.sock:/var/run/docker.sock
-      - localstack-data:/var/lib/localstack
-    networks:
-      - dvtc-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
   backend:
     build: ./backend
     container_name: dvtc-backend
     environment:
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - AWS_REGION=us-east-1
-      - LOCALSTACK_URL=http://localstack:4566
       - FRONTEND_URL=http://localhost:3001
       - SECRET_KEY=super-secret-key-for-ctf
       - DEBUG=true
-    depends_on:
-      localstack:
-        condition: service_healthy
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-    networks:
-      - dvtc-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -67,12 +32,3 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
-    networks:
-      - dvtc-network
-
-networks:
-  dvtc-network:
-    driver: bridge
-
-volumes:
-  localstack-data:

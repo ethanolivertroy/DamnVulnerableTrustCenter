@@ -42,7 +42,7 @@ curl "http://localhost:8000/api/reports/presigned?file=internal-soc2-plan.pdf&ex
 Expected Response:
 ```json
 {
-  "url": "http://localstack:4566/...",
+  "url": "http://localhost:8000/mock-s3/...",
   "bucket": "dvtc-internal-reports",
   "file": "internal-soc2-plan.pdf",
   "expires_in": 86400,
@@ -99,13 +99,6 @@ Expected Response:
 ```
 
 Flag: `flag{too_much_power}`
-
-Alternative (Using AWS CLI):
-```bash
-aws --endpoint-url=http://localhost:4566 \
-  secretsmanager get-secret-value \
-  --secret-id okta_api_token
-```
 
 ### Why This is Vulnerable
 - No authentication required to access Secrets Manager
@@ -428,20 +421,6 @@ Expected Response:
 ```
 
 Flag: `flag{internet_never_forgets}`
-
-Alternative (Using AWS CLI):
-```bash
-# List versions
-aws --endpoint-url=http://localhost:4566 s3api list-object-versions \
-  --bucket dvtc-internal-reports --prefix .env.backup
-
-# Get specific version
-aws --endpoint-url=http://localhost:4566 s3api get-object \
-  --bucket dvtc-internal-reports \
-  --key .env.backup \
-  --version-id <VERSION_ID> \
-  output.txt
-```
 
 ### Why This is Vulnerable
 - S3 versioning keeps deleted files accessible

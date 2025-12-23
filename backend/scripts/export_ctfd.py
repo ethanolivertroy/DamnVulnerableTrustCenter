@@ -168,15 +168,13 @@ If you find issues with challenges, please notify the organizers.""",
 
 ## Local Setup
 1. Clone the DVTC repository
-2. Run `docker-compose up --build`
-3. Access the application at http://localhost:3000
+2. Run `make up` or `docker-compose up --build`
+3. Access the application at http://localhost:3001
 4. Backend API at http://localhost:8000
-5. LocalStack at http://localhost:4566
 
 ## Tools Recommended
 - Browser Developer Tools
 - Burp Suite or OWASP ZAP
-- AWS CLI (configured for LocalStack)
 - curl or httpie
 - Python for scripting
 

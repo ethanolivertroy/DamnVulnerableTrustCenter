@@ -4,7 +4,6 @@
 # This script tests all 12 CTF challenges to ensure they work correctly
 
 API_URL="http://localhost:8000"
-LOCALSTACK_URL="http://localhost:4566"
 
 echo "================================================"
 echo "DVTC CTF Challenge Testing Script v0.1"

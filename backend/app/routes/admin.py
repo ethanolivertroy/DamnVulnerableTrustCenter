@@ -6,20 +6,14 @@ import os
 from datetime import datetime, timedelta
 import hashlib
 import base64
-import boto3
-from botocore.exceptions import ClientError
+
+from ..services.mock_aws import get_mock_secrets_client, MockClientError
 
 router = APIRouter()
 
-# Initialize Secrets Manager client for LocalStack
+# Use mock Secrets Manager client (replaces LocalStack)
 def get_secrets_client():
-    return boto3.client(
-        'secretsmanager',
-        endpoint_url=os.getenv('LOCALSTACK_URL', 'http://localstack:4566'),
-        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID', 'test'),
-        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY', 'test'),
-        region_name=os.getenv('AWS_REGION', 'us-east-1')
-    )
+    return get_mock_secrets_client()
 
 # VULNERABILITY: Weak admin credentials
 ADMIN_USERS = {
@@ -440,7 +434,7 @@ async def list_secrets():
             "hint": "Try /api/admin/secrets/<secret_name> to read a specific secret"
         }
 
-    except ClientError as e:
+    except MockClientError as e:
         raise HTTPException(status_code=500, detail=f"Failed to list secrets: {str(e)}")
 
 @router.get("/secrets/{secret_name}")
@@ -477,7 +471,7 @@ async def get_secret(secret_name: str, include_flag: bool = Query(False)):
 
         return result
 
-    except ClientError as e:
+    except MockClientError as e:
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
             raise HTTPException(status_code=404, detail=f"Secret '{secret_name}' not found")
         raise HTTPException(status_code=500, detail=f"Failed to get secret: {str(e)}")

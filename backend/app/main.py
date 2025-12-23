@@ -88,7 +88,7 @@ async def health():
         "timestamp": datetime.now().isoformat(),
         "services": {
             "api": "running",
-            "localstack": "connected" if os.getenv("LOCALSTACK_URL") else "not_configured",
+            "mock_aws": "in_memory",
             "database": "in_memory"
         }
     }

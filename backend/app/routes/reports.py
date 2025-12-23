@@ -1,7 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from fastapi.responses import JSONResponse, FileResponse
-import boto3
-from botocore.exceptions import ClientError
 import os
 from datetime import datetime, timedelta
 import json
@@ -9,26 +7,13 @@ import base64
 from typing import Optional
 import hashlib
 
+from ..services.mock_aws import get_mock_s3_client, MockClientError
+
 router = APIRouter()
 
-# Initialize AWS clients for LocalStack
+# Use mock S3 client (replaces LocalStack)
 def get_s3_client():
-    return boto3.client(
-        's3',
-        endpoint_url=os.getenv('LOCALSTACK_URL', 'http://localstack:4566'),
-        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID', 'test'),
-        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY', 'test'),
-        region_name=os.getenv('AWS_REGION', 'us-east-1')
-    )
-
-def get_lambda_client():
-    return boto3.client(
-        'lambda',
-        endpoint_url=os.getenv('LOCALSTACK_URL', 'http://localstack:4566'),
-        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID', 'test'),
-        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY', 'test'),
-        region_name=os.getenv('AWS_REGION', 'us-east-1')
-    )
+    return get_mock_s3_client()
 
 @router.get("/list")
 async def list_reports(include_internal: bool = Query(False)):
@@ -154,7 +139,7 @@ async def get_presigned_url(
 
         return response
 
-    except ClientError as e:
+    except MockClientError as e:
         # VULNERABILITY: Detailed error messages
         raise HTTPException(
             status_code=404,
@@ -275,7 +260,7 @@ async def download_report(report_id: str, token: Optional[str] = Query(None)):
             }
         )
 
-    except ClientError as e:
+    except MockClientError as e:
         raise HTTPException(
             status_code=404,
             detail=f"Failed to download report: {str(e)}"
@@ -322,7 +307,7 @@ async def upload_report(
             "url": f"https://{bucket}.s3.amazonaws.com/{filename}" if public else None
         }
 
-    except ClientError as e:
+    except MockClientError as e:
         raise HTTPException(
             status_code=500,
             detail=f"Upload failed: {str(e)}"
@@ -414,7 +399,7 @@ async def list_deleted_files(bucket: str = Query("dvtc-internal-reports", descri
             "hint": "Use /api/reports/deleted/{key} to recover deleted files"
         }
 
-    except ClientError as e:
+    except MockClientError as e:
         raise HTTPException(status_code=500, detail=f"Failed to list deleted files: {str(e)}")
 
 @router.get("/deleted/{file_key:path}")
@@ -461,7 +446,7 @@ async def recover_deleted_file(
             "warning": "VULNERABILITY: S3 versioning retains deleted files indefinitely!"
         }
 
-    except ClientError as e:
+    except MockClientError as e:
         if e.response['Error']['Code'] == 'NoSuchKey':
             raise HTTPException(status_code=404, detail=f"File '{file_key}' not found in bucket")
         raise HTTPException(status_code=500, detail=f"Failed to recover file: {str(e)}")

@@ -1,6 +1,6 @@
 # Damn Vulnerable Trust Center (DVTC)
 
-**Version 0.1 - API Edition**
+**Version 0.2 - Simplified Edition**
 
 Intentionally vulnerable trust center application for security education and CTF competitions.
 
@@ -22,8 +22,8 @@ Educational platform for learning security through exploitation of a realistic t
 
 ### Prerequisites
 - Docker & Docker Compose
-- 8GB+ RAM
-- Ports 3001, 8000, 4566 available
+- 2GB+ RAM
+- Ports 3001, 8000 available
 
 ### Installation
 
@@ -33,10 +33,11 @@ cd DamnVulnerableTrustCenter
 make init && make up
 ```
 
+Services start in ~30 seconds.
+
 ### Access
 - Frontend: http://localhost:3001
 - Backend API: http://localhost:8000/api/docs
-- LocalStack: http://localhost:4566
 - CTF: http://localhost:3001/ctf
 
 ## Architecture
@@ -49,23 +50,14 @@ graph TB
 
     subgraph "Backend"
         B[FastAPI<br/>Port 8000]
-    end
-
-    subgraph "LocalStack"
-        C[S3]
-        D[Lambda]
-        E[IAM]
-        F[Secrets Manager]
-        G[API Gateway]
+        C[Mock AWS Services]
     end
 
     A -->|API Calls| B
-    B -->|AWS SDK| C
-    B -->|AWS SDK| D
-    B -->|AWS SDK| E
-    B -->|AWS SDK| F
-    B -->|AWS SDK| G
+    B -->|In-Memory| C
 ```
+
+The backend uses in-memory mock AWS services (S3, Secrets Manager) instead of LocalStack for faster startup and simpler deployment.
 
 ## Challenges
 
@@ -123,21 +115,20 @@ curl http://localhost:8000/api/admin/downloadAuditTrail
 
 ## Troubleshooting
 
-### FLAG03 Lambda errors
-LocalStack Lambda doesn't work in Docker-in-Docker. The challenge was moved to `/api/reports/generate`:
-
+### Backend not starting
 ```bash
-curl -X POST "http://localhost:8000/api/reports/generate?template=../etc/passwd"
+make logs
+docker compose logs backend
 ```
 
-### LocalStack not starting
-```bash
-curl http://localhost:4566/_localstack/health
-make localstack-logs
-```
+### Port already in use
+Change the port in docker-compose.yml or stop the conflicting service.
 
-### Out of memory
-Increase Docker memory: Docker Desktop > Settings > Resources > Memory: 8GB+
+### Frontend can't connect to backend
+Ensure both services are healthy:
+```bash
+make health
+```
 
 ## Disclaimer
 

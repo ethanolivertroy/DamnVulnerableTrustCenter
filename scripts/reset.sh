@@ -27,11 +27,6 @@ check_services() {
         exit 1
     fi
 
-    if ! docker compose ps | grep -q "dvtc-localstack.*running"; then
-        echo -e "${RED}LocalStack service is not running. Please run 'make up' first.${NC}"
-        exit 1
-    fi
-
     echo -e "${GREEN}✓ All services are running${NC}"
 }
 
@@ -59,55 +54,6 @@ reset_badges() {
     sleep 3
 
     echo -e "${GREEN}✓ Badge states reset${NC}"
-}
-
-# Function to reset LocalStack resources
-reset_localstack() {
-    echo -e "${YELLOW}Resetting LocalStack resources...${NC}"
-
-    # Re-run LocalStack initialization scripts
-    docker compose exec -T localstack bash -c "
-        for script in /etc/localstack/init/ready.d/*.sh; do
-            echo \"Running: \$(basename \$script)\"
-            bash \$script > /dev/null 2>&1
-        done
-    "
-
-    # Upload fresh seed files to S3
-    if [ -d "./localstack/seed/reports" ]; then
-        echo -e "${YELLOW}  Uploading seed files to S3...${NC}"
-
-        # Upload reports
-        for file in ./localstack/seed/reports/*; do
-            if [ -f "$file" ]; then
-                filename=$(basename "$file")
-                docker compose exec -T localstack bash -c "
-                    aws --endpoint-url=http://localhost:4566 s3 cp /seed/reports/$filename s3://dvtc-internal-reports/$filename 2>/dev/null
-                    aws --endpoint-url=http://localhost:4566 s3 cp /seed/reports/$filename s3://dvtc-public-reports/$filename 2>/dev/null
-                " || true
-            fi
-        done
-
-        # Upload leaked env file with versioning
-        if [ -f "./localstack/seed/fake-keys/.env.leaked" ]; then
-            docker compose exec -T localstack bash -c "
-                # Enable versioning on bucket
-                aws --endpoint-url=http://localhost:4566 s3api put-bucket-versioning \
-                    --bucket dvtc-internal-reports \
-                    --versioning-configuration Status=Enabled 2>/dev/null || true
-
-                # Upload file
-                aws --endpoint-url=http://localhost:4566 s3 cp /seed/fake-keys/.env.leaked \
-                    s3://dvtc-internal-reports/.env 2>/dev/null || true
-
-                # 'Delete' it (creates delete marker with versioning)
-                aws --endpoint-url=http://localhost:4566 s3 rm \
-                    s3://dvtc-internal-reports/.env 2>/dev/null || true
-            " || true
-        fi
-    fi
-
-    echo -e "${GREEN}✓ LocalStack resources reset${NC}"
 }
 
 # Function to clear application logs
@@ -160,9 +106,6 @@ except:
     backend_health=$(curl -s http://localhost:8000/health 2>/dev/null | grep -q "healthy" && echo "✓ Healthy" || echo "✗ Down")
     echo -e "  Backend status: ${backend_health}"
 
-    localstack_health=$(curl -s http://localhost:4566/_localstack/health 2>/dev/null | grep -q "running" && echo "✓ Healthy" || echo "✗ Down")
-    echo -e "  LocalStack status: ${localstack_health}"
-
     frontend_health=$(curl -s http://localhost:3001 2>/dev/null | grep -q "DVTC" && echo "✓ Healthy" || echo "✗ Down")
     echo -e "  Frontend status: ${frontend_health}"
 }
@@ -185,7 +128,6 @@ main() {
     # Perform reset operations
     reset_scoreboard
     reset_badges
-    reset_localstack
     clear_logs
     reset_ai_history
 
@@ -200,7 +142,6 @@ main() {
     echo -e "${BLUE}Access points:${NC}"
     echo "  Frontend:   http://localhost:3001"
     echo "  Backend:    http://localhost:8000"
-    echo "  LocalStack: http://localhost:4566"
     echo ""
     echo -e "${YELLOW}CTF is ready for participants!${NC}"
 }
@@ -211,7 +152,6 @@ if [[ "$1" == "--force" ]] || [[ "$1" == "-f" ]]; then
     check_services
     reset_scoreboard
     reset_badges
-    reset_localstack
     clear_logs
     reset_ai_history
     show_status
