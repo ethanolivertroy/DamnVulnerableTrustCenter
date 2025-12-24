@@ -1,0 +1,29 @@
+# DVTC Trust Center - robots.txt
+# Last updated: 2024-01-15
+
+User-agent: *
+Allow: /
+
+# Internal endpoints - do not index
+Disallow: /admin
+Disallow: /api-demo
+Disallow: /internal
+
+# API documentation (hosted on api subdomain)
+# See: api.{domain}/api/docs for full API reference
+# Note: API subdomain uses same authentication as main app
+
+# Security scanners: please contact security@dvtc.local
+# Bug bounty program: https://dvtc.local/security
+
+# CTF Hint: Good recon starts with understanding the attack surface
+# What other subdomains might exist? Try common ones like:
+# - api.{domain}
+# - dev.{domain}
+# - staging.{domain}
+# - admin.{domain}
+
+# Internal note: Remember to update api.dvtc DNS when migrating
+# TODO: Remove debug endpoints before production launch
+
+Sitemap: /sitemap.xml

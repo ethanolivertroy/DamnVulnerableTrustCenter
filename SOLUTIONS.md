@@ -564,4 +564,67 @@ Flag: `flag{md5_sessions_bad}`
 
 ---
 
-Total Points: 2,150
+## FLAG13: Hidden API Discovery (100 points) - Easy
+
+### Vulnerability
+Reconnaissance - Information Disclosure Through Multiple Channels
+
+### What You'll Learn
+- Subdomain enumeration techniques
+- Reading robots.txt for infrastructure hints
+- JavaScript source analysis
+- Network traffic inspection
+
+### Solution
+
+Method 1: Check robots.txt
+```bash
+curl http://localhost:3001/robots.txt
+```
+
+Look for hints about API subdomains in the comments.
+
+Method 2: View page source or browser console
+```javascript
+// In browser DevTools console:
+console.log(window.__API_URL)
+// Reveals: https://api.dvtc.hackidle.cloud (or http://localhost:8000)
+```
+
+Method 3: Network tab inspection
+- Open DevTools → Network tab
+- Watch API calls reveal the backend URL
+
+Method 4: Access the recon endpoint on the API
+```bash
+curl http://localhost:8000/api/recon
+```
+
+Expected Response:
+```json
+{
+  "message": "Congratulations! You found the API through reconnaissance.",
+  "flag": "flag{recon_is_key}",
+  "techniques": [
+    "Subdomain enumeration (api.*, dev.*, staging.*)",
+    "robots.txt analysis",
+    "JavaScript source analysis",
+    "Network traffic inspection",
+    "DNS enumeration tools (subfinder, amass)"
+  ],
+  "hint": "Good recon is the foundation of every successful pentest"
+}
+```
+
+Flag: `flag{recon_is_key}`
+
+### Why This is Vulnerable
+- Infrastructure details leaked through robots.txt comments
+- API URL exposed in client-side JavaScript (window.__API_URL)
+- Network requests reveal backend endpoints
+- No separation between public docs and internal infrastructure info
+- Fix: Remove internal comments from robots.txt, minimize client-side URL exposure, use server-side API proxying
+
+---
+
+Total Points: 2,250

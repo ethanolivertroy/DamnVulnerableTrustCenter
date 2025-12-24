@@ -187,5 +187,22 @@
       "Try the magic token: admin_override_token_2024"
     ],
     "verification": "Access admin panel with forged or guessed token"
+  },
+  {
+    "id": "FLAG13",
+    "title": "Hidden API Discovery",
+    "category": "Reconnaissance",
+    "points": 100,
+    "description": "Discover the hidden API endpoint through reconnaissance techniques.",
+    "evidence": "Find and access the API subdomain or hidden API documentation",
+    "flag": "flag{recon_is_key}",
+    "hints": [
+      "Good reconnaissance reveals the full attack surface",
+      "Check robots.txt for clues about the infrastructure",
+      "Look at the page source - what URLs are referenced?",
+      "Common subdomains include api.*, dev.*, staging.*",
+      "The browser console and Network tab reveal API calls"
+    ],
+    "verification": "Submit the flag found when successfully discovering the API"
   }
 ]

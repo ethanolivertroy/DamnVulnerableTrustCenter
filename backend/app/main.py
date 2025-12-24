@@ -114,6 +114,22 @@ async def startup_event():
         with open(flags_file, "w") as f:
             json.dump([], f)
 
+@app.get("/api/recon")
+async def recon_reward(request: Request):
+    """FLAG13: Reward for finding the API through reconnaissance"""
+    return {
+        "message": "Congratulations! You found the API through reconnaissance.",
+        "flag": "flag{recon_is_key}",
+        "techniques": [
+            "Subdomain enumeration (api.*, dev.*, staging.*)",
+            "robots.txt analysis",
+            "JavaScript source analysis",
+            "Network traffic inspection",
+            "DNS enumeration tools (subfinder, amass)"
+        ],
+        "hint": "Good recon is the foundation of every successful pentest"
+    }
+
 @app.get("/api/debug")
 async def debug_info(request: Request):
     """VULNERABILITY: Debug endpoint exposed in production"""

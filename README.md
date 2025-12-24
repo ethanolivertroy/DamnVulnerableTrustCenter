@@ -16,7 +16,7 @@ https://github.com/user-attachments/assets/a3272bd0-5f28-4f4a-b9df-c43dde9d7224
 
 Educational platform for learning security through exploitation of a realistic trust center application. This version focuses on API vulnerabilities and cloud misconfigurations.
 
-12 challenges | 2,150 points
+13 challenges | 2,250 points
 
 ## Quick Start
 
@@ -75,8 +75,9 @@ The backend uses in-memory mock AWS services (S3, Secrets Manager) instead of Lo
 | FLAG10 | Compliance Override | Business Logic | 300 |
 | FLAG11 | Debug Mode Exposed | Info Disclosure | 100 |
 | FLAG12 | Weak Session Tokens | Authentication | 150 |
+| FLAG13 | Hidden API Discovery | Reconnaissance | 100 |
 
-**Total:** 12 Challenges | 2,150 Points
+**Total:** 13 Challenges | 2,250 Points
 
 See [SOLUTIONS.md](SOLUTIONS.md) for walkthroughs.
 
