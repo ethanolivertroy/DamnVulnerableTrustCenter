@@ -38,9 +38,6 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Vercel
-.vercel
-
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
@@ -62,9 +59,6 @@ pip-delete-this-directory.txt
 *.cover
 .hypothesis/
 
-# LocalStack
-localstack-data/
-
 # Docker
 *.log
 docker-compose.override.yml
@@ -75,14 +69,11 @@ docker-compose.override.yml
 
 # OS
 Thumbs.db
-.DS_Store
 Desktop.ini
 
 # Editor
 *.sublime-project
 *.sublime-workspace
-.idea
-.vscode
 *.iml
 
 # Backup files
