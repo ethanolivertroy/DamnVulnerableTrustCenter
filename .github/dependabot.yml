@@ -1,0 +1,33 @@
+# Dependabot Configuration for DVTC
+# ==================================
+#
+# IMPORTANT: Dependabot is intentionally DISABLED for this repository.
+#
+# This is the "Damn Vulnerable Trust Center" (DVTC) - an intentionally
+# vulnerable application designed for:
+#   - Security education and training
+#   - Capture The Flag (CTF) competitions
+#   - Learning about common web vulnerabilities
+#
+# The vulnerabilities in this codebase are FEATURES, not bugs.
+# They include:
+#   - Outdated dependencies with known CVEs
+#   - Hardcoded credentials and API keys
+#   - Injection vulnerabilities (SQL, command, template)
+#   - Broken authentication and authorization
+#   - Sensitive data exposure
+#   - And many more OWASP Top 10 vulnerabilities
+#
+# DO NOT:
+#   - Deploy this application in production
+#   - Enable Dependabot or fix vulnerabilities
+#   - Use this code as a reference for secure development
+#
+# For secure coding practices, see:
+#   - OWASP Secure Coding Guidelines
+#   - CWE/SANS Top 25
+#
+# Learn more: https://github.com/ethanolivertroy/DamnVulnerableTrustCenter
+
+version: 2
+updates: []
