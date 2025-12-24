@@ -15,14 +15,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    labels:
-      # Traefik path-based routing for production (Dokploy)
-      # Routes yourdomain.com/api/* to this backend
-      - "traefik.enable=true"
-      - "traefik.http.routers.dvtc-api.rule=PathPrefix(`/api`)"
-      - "traefik.http.routers.dvtc-api.entrypoints=websecure"
-      - "traefik.http.routers.dvtc-api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.dvtc-api.loadbalancer.server.port=8000"
 
   frontend:
     build: ./frontend
