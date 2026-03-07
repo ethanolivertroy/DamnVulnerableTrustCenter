@@ -1,3 +1,5 @@
+> **ARCHIVED** - This project is no longer actively maintained. The live instance at `dvtc.hackidle.cloud` has been decommissioned. You can still run DVTC locally using Docker Compose (see [Quick Start](#quick-start) below). Archiving because the future of trust/compliance data delivery is API-first — services pulled via API into your own tools, not visiting a vendor's website.
+
 # Damn Vulnerable Trust Center (DVTC)
 
 **Version 0.1.0 - Simplified Edition**
@@ -11,6 +13,44 @@ Intentionally vulnerable trust center application for security education and CTF
 
 https://github.com/user-attachments/assets/a3272bd0-5f28-4f4a-b9df-c43dde9d7224
 
+
+## Screenshots
+
+<details>
+<summary>Homepage — Dashboard with compliance progress, monitoring, and starter guide</summary>
+
+![Homepage](docs/screenshots/homepage.png)
+</details>
+
+<details>
+<summary>CTF Challenges — All 13 challenges with categories and point values</summary>
+
+![CTF Challenges](docs/screenshots/ctf-challenges.png)
+</details>
+
+<details>
+<summary>Login — Admin login page with intentional security notes</summary>
+
+![Login](docs/screenshots/login.png)
+</details>
+
+<details>
+<summary>AI Chatbot — Prompt injection challenge with example prompts</summary>
+
+![Chatbot](docs/screenshots/chatbot.png)
+</details>
+
+<details>
+<summary>API Demo — Interactive vulnerability testing interface</summary>
+
+![API Demo](docs/screenshots/api-demo.png)
+</details>
+
+<details>
+<summary>API Docs — Full Swagger/OpenAPI documentation</summary>
+
+![API Docs](docs/screenshots/api-docs-swagger.png)
+</details>
 
 ## What is DVTC
 
